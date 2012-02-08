@@ -46,4 +46,10 @@ task 'copy-test-libs'(type: Sync) {
   into "$buildDir/libs-test"
 }
 
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.0-milestone-7'
+  jarFile = './gradle-wrapper/gradle-wrapper.jar'
+  scriptFile = './gradle'
+}
+
 defaultTasks 'clean', 'copy-libs', 'copy-test-libs', 'test', 'install'
