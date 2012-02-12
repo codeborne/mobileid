@@ -1,0 +1,68 @@
+apply from: 'build.gradle'
+apply plugin: 'signing'
+
+defaultTasks 'clean', 'test', 'install', 'uploadArchives'
+
+signing {
+  sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+            //repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+              authentication(userName: "$sonatypeUsername", password: "$sonatypePassword")
+            }
+
+            pom.project {
+               name 'mobileid'
+               packaging 'jar'
+               description 'Java wrapper for Mobile-ID'
+               url 'https://github.com/codeborne/mobileid'
+
+               scm {
+                   url 'scm:git@github.com:codeborne/mobileid.git'
+                   connection 'scm:git@github.com:codeborne/mobileid.git'
+                   developerConnection 'scm:git@github.com:codeborne/mobileid.git'
+               }
+
+               licenses {
+                   license {
+                       name 'GPL 1.0'
+                       url 'http://www.gnu.org/copyleft/gpl.html'
+                       distribution 'repo'
+                   }
+               }
+
+               developers {
+                   developer {
+                       id 'angryziber'
+                       name 'Anton Keks'
+                   }
+                   developer {
+                       id 'asolntsev'
+                       name 'Andrei Solntsev'
+                   }
+               }
+           }
+
+           //mess with the generated pom to set the 'packaging' tag
+           pom.withXml { XmlProvider xmlProvider ->
+               def xml = xmlProvider.asString()
+               def pomXml = new XmlParser().parse(new ByteArrayInputStream(xml.toString().bytes))
+
+               pomXml.version[0] + { packaging('jar') }
+
+               def newXml = new StringWriter()
+               def printer = new XmlNodePrinter(new PrintWriter(newXml))
+               printer.preserveWhitespace = true
+               printer.print(pomXml)
+               xml.setLength(0)
+               xml.append(newXml.toString())
+           }
+        }
+    }
+}

@@ -1,17 +1,15 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
+group = 'com.codeborne'
+artifact = 'mobileid'
+version = '0.9.1-SNAPSHOT'
 sourceCompatibility = 1.5
-version = '0.9.1'
+
+defaultTasks 'clean', 'copy-libs', 'copy-test-libs', 'test', 'install'
 
 repositories{
   mavenCentral()
-}
-
-configure(install.repositories.mavenInstaller) {
-  pom.groupId = 'com.codeborne'
-  pom.artifactId = 'mobileid'
-  pom.version = '0.9'
 }
 
 sourceSets {
@@ -26,6 +24,7 @@ sourceSets {
     }
   }
 }
+
 dependencies {
   compile 'org.apache.axis:axis:1.4'
   compile 'org.apache.axis:axis-jaxrpc:1.4'
@@ -33,7 +32,7 @@ dependencies {
   compile 'wsdl4j:wsdl4j:1.6.2'
   testCompile 'junit:junit:4.10'
   testCompile 'org.hamcrest:hamcrest-all:1.1'
-  testCompile 'org.mockito:mockito-all:1.9.0-rc1'
+  testCompile 'org.mockito:mockito-all:1.9.0'
 }
 
 task 'copy-libs'(type: Sync) {
@@ -46,10 +45,25 @@ task 'copy-test-libs'(type: Sync) {
   into "$buildDir/libs-test"
 }
 
+task sourcesJar(type: Jar, dependsOn:classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives jar
+  archives sourcesJar
+  archives javadocJar
+}
+
 task wrapper(type: Wrapper) {
   gradleVersion = '1.0-milestone-7'
   jarFile = './gradle-wrapper/gradle-wrapper.jar'
   scriptFile = './gradle'
 }
 
-defaultTasks 'clean', 'copy-libs', 'copy-test-libs', 'test', 'install'
