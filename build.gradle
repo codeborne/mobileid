@@ -3,8 +3,9 @@ apply plugin: 'maven'
 
 group = 'com.codeborne'
 artifact = 'mobileid'
-version = '0.9.1'
+version = '0.9.2-SNAPSHOT'
 sourceCompatibility = 1.5
+targetCompatibility = 1.5
 
 defaultTasks 'clean', 'copy-libs', 'copy-test-libs', 'test', 'install'
 
@@ -23,6 +24,15 @@ sourceSets {
       srcDir 'test'
     }
   }
+}
+
+[compileJava, compileTestJava]*.options.collect {options ->
+  options.encoding = 'UTF-8'
+  options.debug = true
+  options.deprecation = true
+  options.compilerArgs.add '-Xlint'
+  options.compilerArgs.add '-Xlint:-unchecked'
+  options.compilerArgs.add '-Xlint:-serial'
 }
 
 dependencies {
