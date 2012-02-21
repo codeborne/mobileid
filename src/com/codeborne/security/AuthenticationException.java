@@ -8,6 +8,7 @@ import static java.lang.Integer.parseInt;
 
 public class AuthenticationException extends Exception {
   public enum Code {
+    // Errors for mobileAuthenticate service:
     SERVICE_ERROR(100, "Teenuse üldine veasituatsioon"),
     INVALID_INPUT(101, "Sisendparameetrid mittekorrektsel kujul"),
     MISSING_INPUT(102, "Mõni kohustuslik sisendparameeter on määramata"),
@@ -19,11 +20,20 @@ public class AuthenticationException extends Exception {
     NO_AGREEMENT(301, "Kasutajal pole Mobiil-ID lepingut"),
     CERTIFICATE_REVOKED(302, "Kasutaja sertifikaat ei kehti (OCSP vastus REVOKED)."),
     NOT_ACTIVATED(303, "Kasutajal pole Mobiil-ID aktiveeritud. Aktiveerimiseks tuleks minna aadressile http://mobiil.id.ee"),
-    NOT_VALID(304, "Authentication failed: generated signature is not valid!"),
-    USER_CANCEL(0, "");
+    NOT_VALID(304, "Toiming on lõppenud, kuid kasutaja poolt tekitatud signatuur ei ole kehtiv."), // Authentication failed: generated signature is not valid!
 
-    private int code;
-    private String descriptionInEstonian;
+    // Errors for GetMobileAuthenticateStatus service:
+    OUTSTANDING_TRANSACTION(200, "autentimine alles toimub"),
+    EXPIRED_TRANSACTION(0, "Sessioon on aegunud"),
+    USER_CANCEL(0, "Kasutaja katkestas"),
+    MID_NOT_READY(0, "Mobiil-ID funktsionaalsus ei ole veel kasutatav, proovida mõne aja pärast uuesti"),
+    PHONE_ABSENT(0, "Telefon ei ole levis"),
+    SENDING_ERROR(0, "Muu sõnumi saatmise viga (telefon ei suuda sõnumit vastu võtta, sõnumikeskus häiritud)"),
+    SIM_ERROR(0, "SIM rakenduse viga"),
+    INTERNAL_ERROR(0, "Teenuse tehniline viga");
+
+    private final int code;
+    private final String descriptionInEstonian;
 
     Code(int code, String descriptionInEstonian) {
       this.code = code;
