@@ -34,12 +34,12 @@ public class MobileIDAuthenticator {
   public MobileIDAuthenticator() {
   }
 
-  public MobileIDAuthenticator(String digidocServiceURL) throws MalformedURLException {
-    setDigidocServiceURL(new URL(digidocServiceURL));
+  public MobileIDAuthenticator(String digidocServiceURL) {
+    setDigidocServiceURL(digidocServiceURL);
   }
 
-  public MobileIDAuthenticator(String digidocServiceURL, String serviceName) throws MalformedURLException {
-    setDigidocServiceURL(new URL(digidocServiceURL));
+  public MobileIDAuthenticator(String digidocServiceURL, String serviceName) {
+    setDigidocServiceURL(digidocServiceURL);
     this.serviceName = serviceName;
   }
 
@@ -50,6 +50,14 @@ public class MobileIDAuthenticator {
   public MobileIDAuthenticator(URL digidocServiceURL, String serviceName) {
     setDigidocServiceURL(digidocServiceURL);
     this.serviceName = serviceName;
+  }
+
+  public final MobileIDAuthenticator setDigidocServiceURL(String digidocServiceURL) {
+    try {
+      return setDigidocServiceURL(new URL(digidocServiceURL));
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public final MobileIDAuthenticator setDigidocServiceURL(URL digidocServiceURL) {
@@ -84,24 +92,28 @@ public class MobileIDAuthenticator {
 
   /**
    * Initiates the login session. Note: returned session already contains user's info, but the authenticity is not yet verified.
+   *
    * @param personalCode user's personal code
-   * @param countryCode two letter country code, eg EE
+   * @param countryCode  two letter country code, eg EE
    * @throws AuthenticationException is authentication unsuccessful
+   * @return MobileIDSession instance containing CHALLENGE ID that should be shown to the user
    */
-  public MobileIDSession startLogin(String personalCode, String countryCode) throws AuthenticationException {
+  public MobileIDSession startLogin(String personalCode, String countryCode) {
     return startLogin(personalCode, countryCode, null);
   }
 
   /**
    * Initiates the login session. Note: returned session already contains user's info, but the authenticity is not yet verified.
+   *
    * @param phone phone number, either a local one (work for EE) or with country code (eg +37255667788).
    * @throws AuthenticationException is authentication unsuccessful
+   * @return MobileIDSession instance containing CHALLENGE ID that should be shown to the user
    */
-  public MobileIDSession startLogin(String phone) throws AuthenticationException {
+  public MobileIDSession startLogin(String phone) {
     return startLogin(null, null, phone);
   }
-  
-  protected MobileIDSession startLogin(String personalCode, String countryCode, String phone) throws AuthenticationException {
+
+  protected MobileIDSession startLogin(String personalCode, String countryCode, String phone) {
     if (digiDocServicePortType == null) {
       throw new IllegalStateException("digidocServiceURL is not initialized");
     }
@@ -121,8 +133,7 @@ public class MobileIDAuthenticator {
           messagingMode, 0, false, false, sessCode, result,
           personalCodeHolder, firstName, lastName, new StringHolder(), new StringHolder(), new StringHolder(), challenge,
           new StringHolder(), new StringHolder());
-    }
-    catch (RemoteException e) {
+    } catch (RemoteException e) {
       throw new AuthenticationException(e);
     }
 
@@ -134,23 +145,24 @@ public class MobileIDAuthenticator {
 
   protected String generateSPChallenge() {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 20; i++) sb.append((int)(Math.random() * 10));
+    for (int i = 0; i < 20; i++) sb.append((int) (Math.random() * 10));
     return sb.toString();
   }
 
   /**
    * Waits until user confirms their identity using the mobile device.
+   *
    * @param session previously returned by {@link #startLogin}
    * @throws AuthenticationException is authentication unsuccessful
+   * @return MobileIDSession instance containing user name and personal code
    */
-  public MobileIDSession waitForLogin(MobileIDSession session) throws AuthenticationException {
+  public MobileIDSession waitForLogin(MobileIDSession session) {
     StringHolder status = new StringHolder("OUTSTANDING_TRANSACTION");
     int tryCount = 0;
     while (sleep(pollIntervalMs) && "OUTSTANDING_TRANSACTION".equals(status.value) && tryCount < retryCount) {
       try {
         digiDocServicePortType.getMobileAuthenticateStatus(session.sessCode, false, status, new StringHolder());
-      }
-      catch (RemoteException e) {
+      } catch (RemoteException e) {
         throw new AuthenticationException(e);
       }
       tryCount++;
@@ -166,8 +178,7 @@ public class MobileIDAuthenticator {
     try {
       Thread.sleep(sleepTimeMilliseconds);
       return true;
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       return false;
     }
   }

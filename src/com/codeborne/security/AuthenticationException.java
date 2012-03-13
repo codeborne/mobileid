@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 import static java.lang.Integer.parseInt;
 
-public class AuthenticationException extends Exception {
+public class AuthenticationException extends RuntimeException {
   public enum Code {
     // Errors for mobileAuthenticate service:
     SERVICE_ERROR(100, "Teenuse üldine veasituatsioon"),
