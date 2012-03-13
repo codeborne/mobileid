@@ -1,6 +1,8 @@
 package com.codeborne.security.mobileid;
 
-public class MobileIDSession {
+import java.io.Serializable;
+
+public class MobileIDSession implements Serializable {
     public final String firstName;
     public final String lastName;
     public final String personalCode;
