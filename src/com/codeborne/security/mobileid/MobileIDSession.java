@@ -19,6 +19,10 @@ public class MobileIDSession implements Serializable {
         this.sessCode = sessCode;
     }
 
+    public String getFullName() {
+        return firstName + "\u00A0" + lastName;
+    }
+
     @Override
     public String toString() {
         return sessCode + ":::" + challenge + ":::" + firstName + ":::" + lastName + ":::" + personalCode;
