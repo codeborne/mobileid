@@ -8,7 +8,7 @@ import static java.lang.Integer.parseInt;
 
 public class AuthenticationException extends RuntimeException {
   public enum Code {
-    // Errors for mobileAuthenticate service:
+    // Codes for mobileAuthenticate service:
     SERVICE_ERROR(100, "Teenuse üldine veasituatsioon"),
     INVALID_INPUT(101, "Sisendparameetrid mittekorrektsel kujul"),
     MISSING_INPUT(102, "Mõni kohustuslik sisendparameeter on määramata"),
@@ -22,7 +22,8 @@ public class AuthenticationException extends RuntimeException {
     NOT_ACTIVATED(303, "Kasutajal pole Mobiil-ID aktiveeritud. Aktiveerimiseks tuleks minna aadressile http://mobiil.id.ee"),
     NOT_VALID(304, "Toiming on lõppenud, kuid kasutaja poolt tekitatud signatuur ei ole kehtiv."), // Authentication failed: generated signature is not valid!
 
-    // Errors for GetMobileAuthenticateStatus service:
+    // Codes for GetMobileAuthenticateStatus service:
+    USER_AUTHENTICATED(0, "autentimine õnnestus"),
     OUTSTANDING_TRANSACTION(200, "autentimine alles toimub"),
     EXPIRED_TRANSACTION(0, "Sessioon on aegunud"),
     USER_CANCEL(0, "Kasutaja katkestas"),

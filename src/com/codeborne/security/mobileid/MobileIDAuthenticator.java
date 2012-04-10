@@ -161,9 +161,11 @@ public class MobileIDAuthenticator {
    */
   public MobileIDSession waitForLogin(MobileIDSession session) {
     int tryCount = 0;
-    while (sleep(pollIntervalMs) && !isLoginComplete(session) && tryCount++ < retryCount) {
+    while (sleep(pollIntervalMs) && !isLoginComplete(session) && tryCount < retryCount) {
         tryCount++;
     }
+    if (tryCount >= retryCount)
+      throw new AuthenticationException(valueOf(getLoginStatus(session).value));
     return session;
   }
 
@@ -175,6 +177,16 @@ public class MobileIDAuthenticator {
    * @return true if login successful
    */
   public boolean isLoginComplete(MobileIDSession session) {
+    StringHolder status = getLoginStatus(session);
+    if ("OUTSTANDING_TRANSACTION".equals(status.value))
+      return false;
+    else if ("USER_AUTHENTICATED".equals(status.value))
+      return true;
+    else
+      throw new AuthenticationException(valueOf(status.value));
+  }
+
+  private StringHolder getLoginStatus(MobileIDSession session) {
     StringHolder status = new StringHolder("OUTSTANDING_TRANSACTION");
     try {
       service.getMobileAuthenticateStatus(session.sessCode, false, status, new StringHolder());
@@ -182,13 +194,7 @@ public class MobileIDAuthenticator {
     catch (RemoteException e) {
       throw new AuthenticationException(e);
     }
-
-    if ("OUTSTANDING_TRANSACTION".equals(status.value))
-      return false;
-    else if ("USER_AUTHENTICATED".equals(status.value))
-      return true;
-    else
-      throw new AuthenticationException(valueOf(status.value));
+    return status;
   }
 
   boolean sleep(int sleepTimeMilliseconds) {

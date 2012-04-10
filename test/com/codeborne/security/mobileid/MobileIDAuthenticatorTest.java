@@ -1,8 +1,8 @@
 package com.codeborne.security.mobileid;
 
 import com.codeborne.security.AuthenticationException;
+import com.codeborne.security.AuthenticationException.Code;
 import com.codeborne.security.digidoc.DigiDocServicePortType;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -11,9 +11,10 @@ import javax.xml.rpc.holders.IntHolder;
 import javax.xml.rpc.holders.StringHolder;
 import java.rmi.RemoteException;
 
+import static com.codeborne.security.AuthenticationException.Code.*;
 import static java.lang.String.valueOf;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -38,16 +39,34 @@ public class MobileIDAuthenticatorTest {
     mid.startLogin("+37255667788");
   }
 
-  @Test @Ignore
+  @Test
   public void waitsIfStatusOutstandingTransaction() throws Exception {
-    mid.service = mockStatus("OUTSTANDING_TRANSACTION");
+    mid.service = mockStatus(OUTSTANDING_TRANSACTION);
+    MobileIDSession session = new MobileIDSession(123, "1234", "Bob", "Boboff", "1234567890");
+    assertFalse(mid.isLoginComplete(session));
+
+    mid = spy(mid);
+    doReturn(true).when(mid).sleep(anyInt());
+    try {
+      mid.waitForLogin(session);
+      fail();
+    }
+    catch (AuthenticationException e) {
+      assertEquals(OUTSTANDING_TRANSACTION, e.getCode());
+    }
   }
 
-  private DigiDocServicePortType mockStatus(final String status) throws RemoteException {
+  @Test
+  public void loginCompleteIfStatusUserAuthenticated() throws Exception {
+    mid.service = mockStatus(USER_AUTHENTICATED);
+    assertTrue(mid.isLoginComplete(new MobileIDSession(123, "1234", "Bob", "Boboff", "1234567890")));
+  }
+
+  private DigiDocServicePortType mockStatus(final Code status) throws RemoteException {
     DigiDocServicePortType service = mock(DigiDocServicePortType.class);
     doAnswer(new Answer<Object>() {
       @Override public Object answer(InvocationOnMock invocation) throws Throwable {
-        ((StringHolder)invocation.getArguments()[2]).value = status;
+        ((StringHolder)invocation.getArguments()[2]).value = status.toString();
         return null;
       }
       }).when(service).getMobileAuthenticateStatus(anyInt(), eq(false), any(StringHolder.class), any(StringHolder.class));
