@@ -29,7 +29,7 @@ public class MobileIDAuthenticator {
   private int pollIntervalMs = 3000;
   private final String messagingMode = "asynchClientServer";
 
-  DigiDocServicePortType digiDocServicePortType;
+  DigiDocServicePortType service;
 
   public MobileIDAuthenticator() {
   }
@@ -63,8 +63,9 @@ public class MobileIDAuthenticator {
   public final MobileIDAuthenticator setDigidocServiceURL(URL digidocServiceURL) {
     DigiDocService_Service digiDocService = new DigiDocService_ServiceLocator();
     try {
-      digiDocServicePortType = digiDocService.getDigiDocService(digidocServiceURL);
-    } catch (ServiceException e) {
+      service = digiDocService.getDigiDocService(digidocServiceURL);
+    }
+    catch (ServiceException e) {
       throw new RuntimeException("Failed to initialize Mobile-ID support", e);
     }
     return this;
@@ -114,7 +115,7 @@ public class MobileIDAuthenticator {
   }
 
   protected MobileIDSession startLogin(String personalCode, String countryCode, String phone) {
-    if (digiDocServicePortType == null) {
+    if (service == null) {
       throw new IllegalStateException("digidocServiceURL is not initialized");
     }
 
@@ -129,11 +130,12 @@ public class MobileIDAuthenticator {
     StringHolder challenge = new StringHolder();
 
     try {
-      digiDocServicePortType.mobileAuthenticate(personalCode, countryCode, phone, language, serviceName, loginMessage, generateSPChallenge(),
-          messagingMode, 0, false, false, sessCode, result,
-          personalCodeHolder, firstName, lastName, new StringHolder(), new StringHolder(), new StringHolder(), challenge,
-          new StringHolder(), new StringHolder());
-    } catch (RemoteException e) {
+      service.mobileAuthenticate(personalCode, countryCode, phone, language, serviceName, loginMessage, generateSPChallenge(),
+              messagingMode, 0, false, false, sessCode, result,
+              personalCodeHolder, firstName, lastName, new StringHolder(), new StringHolder(), new StringHolder(), challenge,
+              new StringHolder(), new StringHolder());
+    }
+    catch (RemoteException e) {
       throw new AuthenticationException(e);
     }
 
@@ -151,34 +153,50 @@ public class MobileIDAuthenticator {
 
   /**
    * Waits until user confirms their identity using the mobile device.
+   * <p>This is a blocking version of {@link #isLoginComplete(MobileIDSession)}
    *
    * @param session previously returned by {@link #startLogin}
    * @throws AuthenticationException is authentication unsuccessful
    * @return MobileIDSession instance containing user name and personal code
    */
   public MobileIDSession waitForLogin(MobileIDSession session) {
-    StringHolder status = new StringHolder("OUTSTANDING_TRANSACTION");
     int tryCount = 0;
-    while (sleep(pollIntervalMs) && "OUTSTANDING_TRANSACTION".equals(status.value) && tryCount < retryCount) {
-      try {
-        digiDocServicePortType.getMobileAuthenticateStatus(session.sessCode, false, status, new StringHolder());
-      } catch (RemoteException e) {
-        throw new AuthenticationException(e);
-      }
-      tryCount++;
+    while (sleep(pollIntervalMs) && !isLoginComplete(session) && tryCount++ < retryCount) {
+        tryCount++;
     }
-
-    if (!"USER_AUTHENTICATED".equals(status.value))
-      throw new AuthenticationException(valueOf(status.value));
-
     return session;
   }
 
-  private boolean sleep(int sleepTimeMilliseconds) {
+  /**
+   * Checks whether login is already complete.
+   * <p>This is a non-blocking version of {@link #waitForLogin(MobileIDSession)}
+   *
+   * @param session previously returned by {@link #startLogin}
+   * @return true if login successful
+   */
+  public boolean isLoginComplete(MobileIDSession session) {
+    StringHolder status = new StringHolder("OUTSTANDING_TRANSACTION");
+    try {
+      service.getMobileAuthenticateStatus(session.sessCode, false, status, new StringHolder());
+    }
+    catch (RemoteException e) {
+      throw new AuthenticationException(e);
+    }
+
+    if ("OUTSTANDING_TRANSACTION".equals(status.value))
+      return false;
+    else if ("USER_AUTHENTICATED".equals(status.value))
+      return true;
+    else
+      throw new AuthenticationException(valueOf(status.value));
+  }
+
+  boolean sleep(int sleepTimeMilliseconds) {
     try {
       Thread.sleep(sleepTimeMilliseconds);
       return true;
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       return false;
     }
   }
