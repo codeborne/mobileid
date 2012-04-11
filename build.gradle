@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.codeborne'
 artifact = 'mobileid'
-version = '0.9.5'
+version = '0.9.6-SNAPSHOT'
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
 
