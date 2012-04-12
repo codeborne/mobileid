@@ -18,6 +18,7 @@ uploadArchives {
             }
 
             pom.project {
+               name archivesBaseName
                packaging 'jar'
                description 'Java wrapper for Mobile-ID'
                url 'https://github.com/codeborne/mobileid'
