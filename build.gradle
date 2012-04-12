@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'com.codeborne'
-artifact = 'mobileid'
+archivesBaseName = 'mobileid'
 version = '0.9.6-SNAPSHOT'
 sourceCompatibility = 1.5
 targetCompatibility = 1.5
@@ -26,6 +26,7 @@ sourceSets {
   }
 }
 
+compileJava.options.debugOptions.debugLevel = "source,lines,vars"
 [compileJava, compileTestJava, javadoc]*.options.collect {options ->
   options.encoding = 'UTF-8'
 }
