@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
 
 import static com.codeborne.security.AuthenticationException.Code.*;
 import static java.lang.String.valueOf;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
