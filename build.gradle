@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.codeborne'
 archivesBaseName = 'mobileid'
-version = '1.0'
+version = '1.1-SNAPSHOTπ'
 
 defaultTasks 'clean', 'test', 'install'
 
@@ -24,8 +24,8 @@ sourceSets {
   }
 }
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 compileJava.options.debugOptions.debugLevel = "source,lines,vars"
 [compileJava, compileTestJava, javadoc]*.options.collect {options ->
