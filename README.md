@@ -31,3 +31,5 @@ Just use the public methods in [MobileIDAuthenticator](http://github.com/codebor
 * isLoginComplete(session) - if you want to do polling from the client side
 
 See working example in [HelloMobileID.java](http://github.com/codeborne/mobileid/blob/master/test/com/codeborne/security/mobileid/HelloMobileID.java) - run the main() method.
+
+[![Build Status](https://travis-ci.org/codeborne/mobileid.svg?branch=master)](https://travis-ci.org/codeborne/mobileid)
