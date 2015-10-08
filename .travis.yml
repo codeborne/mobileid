@@ -1,4 +1,9 @@
 language: java
+sudo: false
+cache:
+  directories:
+  - $HOME/.gradle
+
 script: "./gradle clean test"
 
 jdk:
