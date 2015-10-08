@@ -1,6 +1,5 @@
 Mobile-ID
 =========
-[![Build Status](https://travis-ci.org/codeborne/mobileid.svg?branch=master)](https://travis-ci.org/codeborne/mobileid)
 
 [Mobile-ID](http://www.id.ee/?id=10995&&langchange=1) (Mobiil-ID) is a personal mobile identity in Estonia and Lithuania,
 provided by an additional application on a SIM card. The good thing is that it 
