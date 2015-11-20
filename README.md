@@ -32,4 +32,15 @@ Just use the public methods in [MobileIDAuthenticator](http://github.com/codebor
 
 See working example in [HelloMobileID.java](http://github.com/codeborne/mobileid/blob/master/test/com/codeborne/security/mobileid/HelloMobileID.java) - run the main() method.
 
+# Thanks
+
+Many thanks to these incredible tools that help us creating open-source software:
+
+![Intellij IDEA](http://www.jetbrains.com/idea/docs/logo_intellij_idea.png)
+
+![YourKit Java profiler](http://selenide.org/images/yourkit.png)
+
+# License
+mobile-id is open-source project and distributed under [MIT](http://choosealicense.com/licenses/mit/) license
+
 [![Build Status](https://travis-ci.org/codeborne/mobileid.svg?branch=master)](https://travis-ci.org/codeborne/mobileid)
