@@ -227,7 +227,13 @@ public class MobileIDAuthenticator {
     }
   }
 
-  MobileIdSignatureSession startSign(MobileIdSignatureFile file, String personalCode, String phone) {
+  /**
+   * @param file an instance of MobileIdSignatureFile(fileName, mimeType, contentAsBytes)
+   * @param personalCode the personal code of the user
+   * @param phone the phone number of the user
+   * @return MobileIdSignatureSession instance that contains the session code and the challenge that should be shown to the user
+   */
+  public MobileIdSignatureSession startSign(MobileIdSignatureFile file, String personalCode, String phone) {
     MobileIdSignatureSession session = startSession();
     session = createSignedDoc(session);
     session = addDataFile(session, file.name, file.mimeType, file.content);
@@ -235,7 +241,11 @@ public class MobileIDAuthenticator {
     return session;
   }
 
-  byte[] getSignedFile(MobileIdSignatureSession session) {
+  /**
+   * @param session previously returned by {@link #startSign}
+   * @return byte array of the bdoc file content or null if the signing process is not finished yet
+   */
+  public byte[] getSignedFile(MobileIdSignatureSession session) {
     String status = getStatusInfo(session);
     if ("OUTSTANDING_TRANSACTION".equals(status)) {
       return null;
