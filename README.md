@@ -19,7 +19,9 @@ The same jar works in Scala as well or any other JVM-based language.
 
 You can also use Maven/Ivy/Gradle/SBT or your favorite dependency manager that can fetch jars from the jitpack maven repo:
 
-  [ErkoRisthein/mobileid](https://jitpack.io/#ErkoRisthein/mobileid)
+  [ErkoRisthein/mobileid](https://jitpack.io/#ErkoRisthein/mobileid) 
+  
+  [![](https://jitpack.io/v/ErkoRisthein/mobileid.svg)](https://jitpack.io/#ErkoRisthein/mobileid)
 
 Login Usage
 ===========
