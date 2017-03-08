@@ -382,7 +382,13 @@ public class MobileIDAuthenticator {
     }
   }
 
-  CheckCertificateResponse checkCertificate(String certificate) {
+  /**
+   *
+   * @param certificate Certificate to be checked for validity, in Base64 format. May include
+   *                    "---BEGIN CERTIFICATE---" and "---END CERTIFICATE---" lines (according to PEM format)
+   * @return CheckCertificateResponse that contains the firstName, lastName and personalCode
+   */
+  public CheckCertificateResponse checkCertificate(String certificate) {
     validateServiceUrl();
 
     StringHolder result = new StringHolder();
