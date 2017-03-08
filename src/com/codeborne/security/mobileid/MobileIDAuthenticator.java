@@ -143,7 +143,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIDSession(sessCode.value, challenge.value, firstName.value, lastName.value, personalCodeHolder.value);
   }
@@ -160,8 +160,13 @@ public class MobileIDAuthenticator {
     return phone;
   }
 
-  private void validateResult(StringHolder result) {
+  private void validateOkResult(StringHolder result) {
     if (!"OK".equals(result.value))
+      throw new AuthenticationException(valueOf(result.value));
+  }
+
+  private void validateGoodResult(StringHolder result) {
+    if (!"GOOD".equals(result.value))
       throw new AuthenticationException(valueOf(result.value));
   }
 
@@ -272,7 +277,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIdSignatureSession(sessCode.value);
   }
@@ -289,7 +294,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIdSignatureSession(session.sessCode, signedDocInfo.value);
   }
@@ -307,7 +312,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIdSignatureSession(session.sessCode, signedDocInfo.value);
   }
@@ -327,7 +332,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIdSignatureSession(session.sessCode, session.signedDocInfo, challenge.value);
   }
@@ -345,7 +350,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return statusCode.value;
   }
@@ -362,7 +367,7 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(e);
     }
 
-    validateResult(result);
+    validateOkResult(result);
 
     return new MobileIdSignatureSession(session.sessCode, session.signedDocInfo, session.challenge, signedDocData.value);
   }
@@ -375,5 +380,26 @@ public class MobileIDAuthenticator {
     } catch (RemoteException e) {
       throw new AuthenticationException(e);
     }
+  }
+
+  CheckCertificateResponse checkCertificate(String certificate) {
+    validateServiceUrl();
+
+    StringHolder result = new StringHolder();
+    StringHolder firstName = new StringHolder();
+    StringHolder lastName = new StringHolder();
+    StringHolder personalCode = new StringHolder();
+
+    try {
+      service.checkCertificate(certificate, false, result, personalCode, firstName, lastName, new StringHolder(),
+        new StringHolder(), new StringHolder(), new StringHolder(), new StringHolder(), new StringHolder(), new StringHolder());
+    }
+    catch (RemoteException e) {
+      throw new AuthenticationException(e);
+    }
+
+    validateGoodResult(result);
+
+    return new CheckCertificateResponse(firstName.value, lastName.value, personalCode.value);
   }
 }
