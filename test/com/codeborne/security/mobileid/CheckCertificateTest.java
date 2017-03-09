@@ -23,7 +23,7 @@ public class CheckCertificateTest {
   public void testCheckCertificate() {
     String certificate = "-----BEGIN CERTIFICATE-----\n*removed*\n-----END CERTIFICATE-----";
 
-    MobileIDSession session = digiDocService.checkCertificate(certificate);
+    CheckCertificateResponse session = digiDocService.checkCertificate(certificate);
 
     assertThat(session.firstName, is("Chuck"));
     assertThat(session.lastName, is("Norris"));
