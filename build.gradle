@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.codeborne'
 archivesBaseName = 'mobileid'
-version = '1.1'
+version = '1.2-SNAPSHOT'
 
 defaultTasks 'clean', 'test', 'install'
 
@@ -73,11 +73,5 @@ artifacts {
   archives jar
   archives sourcesJar
   archives javadocJar
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.7'
-  jarFile = './gradle-wrapper/gradle-wrapper.jar'
-  scriptFile = './gradle'
 }
 
