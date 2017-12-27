@@ -119,8 +119,10 @@ public class MobileIDAuthenticator {
       throw new IllegalStateException("digidocServiceURL is not initialized");
     }
 
-    if (phone.startsWith("+")) phone = phone.substring(1);
-    if (!phone.startsWith("372")) phone = "372" + phone;
+    if (phone != null) {
+      if (phone.startsWith("+")) phone = phone.substring(1);
+      if (!phone.startsWith("372")) phone = "372" + phone;
+    }
 
     IntHolder sessCode = new IntHolder();
     StringHolder result = new StringHolder();

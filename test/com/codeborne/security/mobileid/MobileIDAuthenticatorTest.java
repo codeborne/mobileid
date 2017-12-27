@@ -3,6 +3,7 @@ package com.codeborne.security.mobileid;
 import com.codeborne.security.AuthenticationException;
 import com.codeborne.security.AuthenticationException.Code;
 import com.codeborne.security.digidoc.DigiDocServicePortType;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -21,20 +22,44 @@ import static org.mockito.Mockito.*;
 public class MobileIDAuthenticatorTest {
   MobileIDAuthenticator mid = new MobileIDAuthenticator();
 
-  @Test
-  public void startSession() throws RemoteException, AuthenticationException {
+  @Before
+  public void setUp() throws RemoteException {
     mid.service = mockAuthentication("OK", "Bruce", "Willis", "38105060708", "4567", 123);
+    mid.setLoginMessage("Wanna login?");
+  }
 
+  @Test
+  public void loginByPhone() throws RemoteException {
     MobileIDSession session = mid.startLogin("+37255667788");
     assertThat(session.firstName, equalTo("Bruce"));
     assertThat(session.lastName, equalTo("Willis"));
     assertThat(session.personalCode, equalTo("38105060708"));
     assertThat(session.sessCode, equalTo(123));
     assertThat(session.challenge, equalTo("4567"));
+
+    verify(mid.service).mobileAuthenticate(eq(null), eq(null), eq("37255667788"), eq("EST"),
+        eq("Testimine"), eq("Wanna login?"), anyString(), eq("asynchClientServer"), eq(0), eq(false), eq(false), any(IntHolder.class),
+        any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class),
+        any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class));
+  }
+
+  @Test
+  public void loginByPersonalCode() throws RemoteException {
+    MobileIDSession session = mid.startLogin("38105060708", "EE");
+    assertThat(session.firstName, equalTo("Bruce"));
+    assertThat(session.lastName, equalTo("Willis"));
+    assertThat(session.personalCode, equalTo("38105060708"));
+    assertThat(session.sessCode, equalTo(123));
+    assertThat(session.challenge, equalTo("4567"));
+
+    verify(mid.service).mobileAuthenticate(eq("38105060708"), eq("EE"), eq(null), eq("EST"),
+        eq("Testimine"), eq("Wanna login?"), anyString(), eq("asynchClientServer"), eq(0), eq(false), eq(false), any(IntHolder.class),
+        any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class),
+        any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class));
   }
 
   @Test(expected = AuthenticationException.class)
-  public void throwsExceptionIfError() throws RemoteException, AuthenticationException {
+  public void throwsAuthenticationExceptionInCaseOfError() throws RemoteException, AuthenticationException {
     mid.service = mockError(100);
     mid.startLogin("+37255667788");
   }
@@ -73,20 +98,18 @@ public class MobileIDAuthenticatorTest {
     return service;
   }
 
-  private DigiDocServicePortType mockAuthentication(final String result, final String firstName, final String lastName, final String personalCode, final String challenge, final int sessCode) throws RemoteException {
+  private DigiDocServicePortType mockAuthentication(String result, String firstName, String lastName,
+                                                    String personalCode, String challenge, int sessCode) throws RemoteException {
     DigiDocServicePortType service = mock(DigiDocServicePortType.class);
-    doAnswer(new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        ((IntHolder)invocation.getArguments()[11]).value = sessCode;
-        ((StringHolder)invocation.getArguments()[12]).value = result;
-        ((StringHolder)invocation.getArguments()[13]).value = personalCode;
-        ((StringHolder)invocation.getArguments()[14]).value = firstName;
-        ((StringHolder)invocation.getArguments()[15]).value = lastName;
-        ((StringHolder)invocation.getArguments()[19]).value = challenge;
-        return null;
-      }
-    }).when(service).mobileAuthenticate(anyString(), anyString(), eq("37255667788"), anyString(),
+    doAnswer((Answer<Object>) invocation -> {
+      ((IntHolder)invocation.getArguments()[11]).value = sessCode;
+      ((StringHolder)invocation.getArguments()[12]).value = result;
+      ((StringHolder)invocation.getArguments()[13]).value = personalCode;
+      ((StringHolder)invocation.getArguments()[14]).value = firstName;
+      ((StringHolder)invocation.getArguments()[15]).value = lastName;
+      ((StringHolder)invocation.getArguments()[19]).value = challenge;
+      return null;
+    }).when(service).mobileAuthenticate(anyString(), anyString(), anyString(), anyString(),
         anyString(), anyString(), anyString(), anyString(), anyInt(), anyBoolean(), anyBoolean(), any(IntHolder.class),
         any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class),
         any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class));
