@@ -4,12 +4,13 @@ import com.codeborne.security.AuthenticationException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
 
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
+/**
+ * You can use the following test phone numbers:
+ * https://www.id.ee/?id=36373
+ */
 public class HelloMobileID {
   private static final String TEST_DIGIDOC_SERVICE_URL = "https://tsp.demo.sk.ee/";
   private MobileIDAuthenticator mid;
@@ -17,14 +18,14 @@ public class HelloMobileID {
   private JTextField phone;
   private JLabel message;
 
-  public static void main(String[] args) throws MalformedURLException {
+  public static void main(String[] args) {
     System.setProperty("javax.net.ssl.trustStore", "test/keystore.jks");
     HelloMobileID app = new HelloMobileID();
     app.mid = new MobileIDAuthenticator(TEST_DIGIDOC_SERVICE_URL);
     app.create();
   }
 
-  public final void login(String phoneNumber) {
+  private void login(String phoneNumber) {
     try {
       final MobileIDSession mobileIDSession = mid.startLogin(phoneNumber);
       showMessage("<br>Challenge: " + mobileIDSession.challenge + "<br>You will get SMS in few seconds.<br>Please accept it to login.<br>");
@@ -41,12 +42,9 @@ public class HelloMobileID {
   }
 
   private void showMessage(final String message) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        HelloMobileID.this.message.setText("<html>" + message + "</html>");
-        frame.pack();
-      }
+    SwingUtilities.invokeLater(() -> {
+      HelloMobileID.this.message.setText("<html>" + message + "</html>");
+      frame.pack();
     });
   }
 
@@ -63,18 +61,10 @@ public class HelloMobileID {
 
   private JComponent createContent() {
     JButton button = new JButton("Login with MobileID");
-    button.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        new Thread() {
-          @Override
-          public void run() {
-            showMessage("<br><br>Connecting to MobileID server...<br><br><br>");
-            login(phone.getText());
-          }
-        }.start();
-      }
-    });
+    button.addActionListener(e -> new Thread(() -> {
+      showMessage("<br><br>Connecting to MobileID server...<br><br><br>");
+      login(phone.getText());
+    }).start());
 
     message = new JLabel("<html><br><br>Enter your phone<br><br><br></html>");
     phone = new JTextField("+372", 30);
