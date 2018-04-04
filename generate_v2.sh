@@ -1,0 +1,1 @@
+java -Djavax.net.ssl.trustStore=test/keystore.jks -cp build/lib/axis-1.4.jar:build/lib/commons-logging-1.1.1.jar:build/lib/commons-discovery-0.5.jar:build/lib/wsdl4j-1.6.3.jar:build/lib/axis-jaxrpc-1.4.jar org.apache.axis.wsdl.WSDL2Java -a https://digidocservice.sk.ee/v2/mid.wsdl
