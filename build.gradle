@@ -3,7 +3,7 @@ apply plugin: 'maven'
 
 group = 'com.codeborne'
 archivesBaseName = 'mobileid'
-version = '1.3-SNAPSHOT'
+version = '1.4-SNAPSHOT'
 
 defaultTasks 'clean', 'test', 'install'
 
