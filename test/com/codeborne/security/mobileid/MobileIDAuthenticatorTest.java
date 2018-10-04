@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import static com.codeborne.security.AuthenticationException.Code.*;
 import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -44,6 +45,16 @@ public class MobileIDAuthenticatorTest {
   }
 
   @Test
+  public void removesPlusFromPhoneNumber() {
+    assertThat(mid.normalizePhoneNumber("+37255667788"), equalTo("37255667788"));
+
+    assertThat(mid.normalizePhoneNumber(null), nullValue());
+    assertThat(mid.normalizePhoneNumber(""), equalTo(""));
+    assertThat(mid.normalizePhoneNumber("37255667788"), equalTo("37255667788"));
+    assertThat(mid.normalizePhoneNumber("55667788"), equalTo("55667788"));
+  }
+
+  @Test
   public void loginByPersonalCode() throws RemoteException {
     MobileIDSession session = mid.startLogin("38105060708", "EE");
     assertThat(session.firstName, equalTo("Bruce"));
@@ -60,7 +71,7 @@ public class MobileIDAuthenticatorTest {
 
   @Test(expected = AuthenticationException.class)
   public void throwsAuthenticationExceptionInCaseOfError() throws RemoteException, AuthenticationException {
-    mid.service = mockError(100);
+    mid.service = mockError(100, "37255667788");
     mid.startLogin("+37255667788");
   }
 
@@ -117,10 +128,10 @@ public class MobileIDAuthenticatorTest {
     return service;
   }
 
-  private DigiDocServicePortType mockError(int errorCode) throws RemoteException {
+  private DigiDocServicePortType mockError(int errorCode, String phoneNumber) throws RemoteException {
     DigiDocServicePortType service = mock(DigiDocServicePortType.class);
     doThrow(new RemoteException(valueOf(errorCode)))
-    .when(service).mobileAuthenticate(anyString(), anyString(), eq("37255667788"), anyString(),
+    .when(service).mobileAuthenticate(anyString(), anyString(), eq(phoneNumber), anyString(),
         anyString(), anyString(), anyString(), anyString(), anyInt(), anyBoolean(), anyBoolean(), any(IntHolder.class),
         any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class),
         any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class), any(StringHolder.class));

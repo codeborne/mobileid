@@ -106,7 +106,7 @@ public class MobileIDAuthenticator {
   /**
    * Initiates the login session. Note: returned session already contains user's info, but the authenticity is not yet verified.
    *
-   * @param phone phone number, either a local one (work for EE) or with country code (eg +37255667788).
+   * @param phone phone number <b>with country code</b> (eg "+37255667788" or "37255667788").
    * @throws AuthenticationException is authentication unsuccessful
    * @return MobileIDSession instance containing CHALLENGE ID that should be shown to the user
    */
@@ -119,11 +119,6 @@ public class MobileIDAuthenticator {
       throw new IllegalStateException("digidocServiceURL is not initialized");
     }
 
-    if (phone != null) {
-      if (phone.startsWith("+")) phone = phone.substring(1);
-      if (!phone.startsWith("372")) phone = "372" + phone;
-    }
-
     IntHolder sessCode = new IntHolder();
     StringHolder result = new StringHolder();
     StringHolder firstName = new StringHolder();
@@ -132,7 +127,7 @@ public class MobileIDAuthenticator {
     StringHolder challenge = new StringHolder();
 
     try {
-      service.mobileAuthenticate(personalCode, countryCode, phone, language, serviceName, loginMessage, generateSPChallenge(),
+      service.mobileAuthenticate(personalCode, countryCode, normalizePhoneNumber(phone), language, serviceName, loginMessage, generateSPChallenge(),
               messagingMode, 0, false, false, sessCode, result,
               personalCodeHolder, firstName, lastName, new StringHolder(), new StringHolder(), new StringHolder(), challenge,
               new StringHolder(), new StringHolder());
@@ -145,6 +140,10 @@ public class MobileIDAuthenticator {
       throw new AuthenticationException(valueOf(result.value));
 
     return new MobileIDSession(sessCode.value, challenge.value, firstName.value, lastName.value, personalCodeHolder.value);
+  }
+
+  String normalizePhoneNumber(String phone) {
+    return phone != null && phone.startsWith("+") ? phone.substring(1) : phone;
   }
 
   protected String generateSPChallenge() {
