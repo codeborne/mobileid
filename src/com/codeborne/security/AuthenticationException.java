@@ -21,6 +21,7 @@ public class AuthenticationException extends RuntimeException {
     CERTIFICATE_REVOKED(302, "Kasutaja sertifikaat ei kehti (OCSP vastus REVOKED)."),
     NOT_ACTIVATED(303, "Kasutajal pole Mobiil-ID aktiveeritud. Aktiveerimiseks tuleks minna aadressile http://mobiil.id.ee"),
     NOT_VALID(304, "Toiming on lõppenud, kuid kasutaja poolt tekitatud signatuur ei ole kehtiv."), // Authentication failed: generated signature is not valid!
+    CERTIFICATE_EXPIRED(305, "Kasutaja sertifikaat on aegunud"),
 
     // Codes for GetMobileAuthenticateStatus service:
     USER_AUTHENTICATED(0, "autentimine õnnestus"),
