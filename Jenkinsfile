@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     REPO_NAME = "${env.JOB_NAME.split('/')[1]}"
-    DEST=/var/www/repo/com/codeborne/mobileid
+    DEST = "/var/www/repo/com/codeborne/mobileid"
   }
 
   stages {
