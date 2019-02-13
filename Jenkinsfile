@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'docker -t $REPO_NAME .'
+        sh 'docker build -t $REPO_NAME .'
       }
     }
   }
