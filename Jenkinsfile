@@ -15,7 +15,7 @@ pipeline {
     stage('Publish') {
       steps {
         sh 'mkdir -p $DEST'
-        sh 'docker run -v /var/www/repo:/var/www/repo $REPO_NAME cp build/libs/mobileid*.jar $DEST'
+        sh 'docker run -v /var/www/repo:/var/www/repo $REPO_NAME sh -c "cp build/libs/mobileid*.jar $DEST"'
       }
     }
   }
