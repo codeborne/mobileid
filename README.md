@@ -1,6 +1,8 @@
 Mobile-ID
 =========
 
+**Obsolete**: this library used the SOAP/WSDL API for Mobile-ID, which has now be replaced by a new REST API.
+
 [Mobile-ID](http://www.id.ee/?id=10995&&langchange=1) (Mobiil-ID) is a personal mobile identity in Estonia and Lithuania,
 provided by an additional application on a SIM card. The good thing is that it 
 is backed by government and provides the same level of security for authentication 
